@@ -1,0 +1,104 @@
+#!/bin/bash
+directorioPrincipal=/home/minecraft/Minecraft/
+latestLog=/logs/latest.log
+logSave=/logSave.txt
+
+#funcion para eliminar las funciones exportadas a la shell en la ejecucion del script
+function eliminar(){
+	unset -f ayuda downloadServer eliminar log logSave directorio salvar eSalvar restaurar eRestaurar
+	unset directorioPrincipal latestLog logSave
+}
+if [ $1 ];then
+	case $1 in 
+		
+		("e")
+			case $2 in 
+				("salvar")
+					. funcionesMinecraft
+					eSalvar $1 $3
+				;;
+				(*)
+					echo
+					echo "No existe el comando o no has pasado una opcion."
+					echo
+				;;
+			esac
+		;;
+		("d")
+
+		;;
+		("salvar")
+			. funcionesMinecraft
+			if [ $2 ];then
+				salvar $2
+			else
+				echo 
+				echo "No ha especificado una version de juego."
+				echo
+			fi
+		;;
+		("restaurar")
+			echo
+			echo "Verificando si existe el directorio de juego."
+			if [ -d "$directorioPrincipal$2" ];then
+				case $2 in 
+					( "7")
+							echo
+							echo "Empezando a restaurar la copia de seguridad del juego $2"
+							echo
+							rm -R $directorioPrincipal$2/CIUDAD/
+							cp -R $directorioPrincipal$2/backups/* $directorioPrincipal$2/
+							echo "Hecha la retauracion perfectamente. Puedes ejecutar minecraft otra vez"
+							echo
+						;;
+					 	("75" | "75t")
+							echo
+							echo "De esta version no hay backup."
+							echo
+						;;
+						(*)
+							echo
+							echo "Empezando a restaurar la copia de seguridad del juego $2"
+							echo
+							rm -R $directorioPrincipal$2/world/
+							cp -R $directorioPrincipal$2/backup/* $directorioPrincipal$2/
+							echo "Hecha la restauracion perfectamente. Puedes ejecutar minecraft otra vez"
+							echo
+						;;
+				esac
+			else
+				echo
+				echo "El directorio de juego $directorioPrincipal$2 no existe."
+				echo "Restauracion no realizada, compruebe que existe el directorio de juego $directorioPrincipal$2 ."
+				echo
+			fi
+		;;
+		("log")
+			. funcionesMinecraft
+			log $2	
+		;;
+		("logSave")
+			. funcionesMinecraft 
+			logSave $2 $3
+		;;
+		("directorio")
+			. funcionesMinecraft
+			directorio $2
+		;;
+		("versiones")
+
+		;;
+		"ayuda")
+			. funcionesMinecraft 
+			ayuda	
+		;;
+		(*)
+			
+		;;
+	esac
+eliminar
+else
+	echo
+	echo "No ha pasado una opcion para el programa."
+	echo
+fi

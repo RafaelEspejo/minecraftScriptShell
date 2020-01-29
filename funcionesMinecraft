@@ -1,0 +1,285 @@
+#!/bin/bash
+
+
+
+#wget -O index https://www.minecraft.net/es-es/download/server/
+#cat index | grep launcher >link.txt
+#wget $(cat link.txt | cut -d '"' -f 2)
+#mv server.jar minecraftServer$version.jar
+#rm index link.txt
+
+function downloadServer(){
+	echo
+	echo "Verificando si hay conexion a internet"
+	ping -c 1 -n4 minecraft.net> /dev/null 2>&1
+ 	echo
+	if [ $? = 0 ];then
+		echo "Conexion establecida. Iniciando la descarga del servidor."
+		echo
+		wget -O index https://www.minecraft.net/es-es/download/server/> /dev/null 2>&1
+    	wget -O minecraftServer$1.jar $(cat index | grep launcher | cut -d '"' -f 2) && rm index
+    	salida=$(echo $?)
+    	echo "Servidor descargado."
+    	echo
+    else
+    	salida=1
+    	echo "No hay conexion con el servidor o no hay conexion a internet."
+    	echo
+    fi
+}
+function salvar(){
+
+	valido="0-9_"
+	novalido="a-zA-Z"
+	if [[ $1 =~ ^[$valido] ]] && [ $1 != '_' ] && [ $1 != " " ];then
+		echo
+		echo "Verificando si existe el directorio de juego."
+		if [ -d "$directorioPrincipal$1" ];then	
+			echo
+			echo "Empezando a hacer copia de seguridad del juego $1"
+			echo
+			error=$(rm -R $directorioPrincipal$1/backup/* 2>&1)
+			salida=$(echo $?)
+			fecha=$(date +'%d/%m/%Y %H:%M:%S')
+			if [ $salida = 0 ]; then
+				error=$(cp -R $directorioPrincipal$1/world/ $directorioPrincipal$1/backup/ 2>&1)
+				salida=$(echo $?)
+				if [ $salida = 0 ]; then
+					echo "$fecha - Partida salvada correctamente">>"$directorioPrincipal$1$logSave"
+					echo "Hecha la copia perfectamente. Puedes ejecutar minecraft otra vez"
+					echo
+				elif [ $salida = 1 ]; then
+					echo "$fecha - Se produjo un error al guardar la partida. Error:' $error '">>"$directorioPrincipal$1$logSave"
+					echo "Se produjo un error al guardar la partida, revise el log o pongase en contacto con el administrador."
+					echo
+				fi
+			elif [ $salida = 1 ]; then
+				echo "$fecha - Se produjo un error al guardar la partida. Error:' $error '">>"$directorioPrincipal$1$logSave"
+				echo "Se produjo un error al guardar la partida, revise el log o pongase en contacto con el administrador."
+				echo
+			fi
+		else
+			echo
+			echo "El directorio de juego $directorioPrincipal$1 corresponde a una subversion, no existen los directorios para las subverisones de juego."
+			echo "Copia no realizada, introduzca una version de juego."
+			echo
+		fi
+	elif [ $1 = '_' ];then
+	echo
+	echo "No se puede introducir un $1 como nombre de version."
+	echo
+	else
+		echo
+		echo "La version $1 puede ser una version especial, intente usar la opcion e para hacer la copia de seguridad."
+		echo "Ejemplo: minecraft e salvar 8."
+		echo
+	fi
+}
+function eSalvar(){
+	if [ -d "$directorioPrincipal$1$2" ];then	
+		case $2 in 
+			( "7")
+				echo
+				echo "Empezando a hacer copia de seguridad del juego $2"
+				echo
+				rm -R $directorioPrincipal$1$2/backups/*
+				cp -R $directorioPrincipal$1$2/CIUDAD/ $directorioPrincipal$1$2/backups/
+				echo "Hecha la copia perfectamente. Puedes ejecutar minecraft otra vez"
+				echo
+			;;
+		 	("75" | "75t")
+				echo
+				echo "De esta version no se hace backup."
+				echo
+			;;
+			(*)
+				echo
+				echo "Empezando a hacer copia de seguridad del juego $2"
+				echo
+				error=$(rm -R $directorioPrincipal$1$2/backup/* 2>&1)
+				salida=$(echo $?)
+				fecha=$(date +'%d/%m/%Y %H:%M:%S')
+				if [ $salida = 0 ]; then
+					error=$(cp -R $directorioPrincipal$1$2/world/ $directorioPrincipal$1$2/backup/ 2>&1)
+					salida=$(echo $?)
+					if [ $salida = 0 ]; then
+							echo "$fecha - Partida salvada correctamente">>"$directorioPrincipal$1$2$logSave"
+							echo "Hecha la copia perfectamente. Puedes ejecutar minecraft otra vez"
+					elif [ $salida = 1 ]; then
+							echo "$fecha - Se produjo un error al guardar la partida. Error:' $error '">>"$directorioPrincipal$1$2$logSave"
+							echo "Se produjo un error al guardar la partida, revise el log o pongase en contacto con el administrador."
+					fi
+				elif [ $salida = 1 ]; then
+					echo "$fecha - Se produjo un error al guardar la partida. Error:' $error '">>"$directorioPrincipal$1$2$logSave"
+					echo "Se produjo un error al guardar la partida, revise el log o pongase en contacto con el administrador."
+				fi
+			;;
+		esac
+	else
+		echo
+		echo "El directorio de juego $directorioPrincipal$1$2 no existe."
+		echo "Copia no realizada, compruebe que existe el directorio de juego $directorioPrincipal$1$2 ."
+		echo
+	fi
+}
+function restaurar(){
+echo
+}
+function eRestaurar(){
+echo
+}
+function log(){
+	case $1 in
+		([0-9][0-9] | [0-9])
+			if [ -d "$directorioPrincipal$1" ];then
+				if [ -f $directorioPrincipal$1$latestLog ];then
+					echo
+					cat "$directorioPrincipal$1$latestLog"
+					echo
+				else
+					echo 
+					echo "No existe el log para esta version $1."
+					echo
+				fi
+			else
+				echo
+				echo "No existe el directorio del juego."
+				echo
+			fi
+		;;
+		([0-9]"_"[0-9] | [0-9][0-9]"_"[0-9])
+			echo
+			echo "Recuerde que los directorios de subversion no existen sino los de version."
+			echo "Ejemplo de version: 15."
+			echo "Ejemplo de subversion: 15_1."
+			echo "Introduzca un numero de version."
+			echo
+	    ;; 
+		(*)
+			echo
+			echo "No ha introducido un numero de version, introduzca un numero de version."
+			echo
+		;;
+	esac
+}
+function logSave(){
+	case $1 in
+		"last" | "all")
+			case $2 in 
+				([0-9][0-9] | [0-9] | [0-9][0-9]"t")
+					if [ -d "$directorioPrincipal$2" ];then
+						if [ $2 != "7" ] && [ $2 != "75" ] && [ $2 != "75t" ];then
+							echo ""
+							echo "   Log de partidas guardadas de la version $3"
+							if [ -f $directorioPrincipal$2$logSave ];then
+								if  [ $1 = "last" ];then 
+									echo ""
+									cat "$directorioPrincipal$2$logSave" | tail -n1
+									echo ""
+								elif [ $1 = "all" ];then
+									echo ""
+									cat "$directorioPrincipal$2$logSave"
+									echo ""
+								fi
+							else 
+								echo
+								echo "Aun no se ha hecho ningun copia de guardado."
+								echo
+							fi
+						else
+							echo
+							echo "Para esta version $2 no hay archivo de guardado de partida."
+							echo
+						fi
+					else
+						echo
+						echo "El directorio de juego $directorioPrincipal$2 no existe."
+						echo
+					fi
+				;;
+				([0-9]"_"[0-9] | [0-9][0-9]"_"[0-9])
+					echo
+					echo "Recuerde que los directorios de subversion no existen sino los de version."
+					echo "Ejemplo de version: 15."
+					echo "Ejemplo de subversion: 15_1."
+					echo "Introduzca un numero de version."
+					echo
+			    ;; 
+				(*)
+					echo
+					echo "No ha introducido un numero de version, introduzca un numero de version."
+					echo
+				;;
+			esac
+		;;
+		*)
+		  echo
+		  echo "No existe la opcion $1 introducida."     
+		  echo
+		;;
+	esac
+}
+function directorio(){
+	case $1 in
+		([0-9][0-9] | [0-9] | "e"*)
+			if [ -d "$directorioPrincipal$1" ];then
+				cd "$directorioPrincipal$1"> /dev/null 2>&1
+			else
+				echo
+				echo "No existe el directorio."
+				echo
+			fi
+		;;
+		([0-9]"_"[0-9] | [0-9][0-9]"_"[0-9])
+			echo
+			echo "Recuerde que los directorios de subversion no existen sino los de version."
+			echo "Ejemplo de version: 15."
+			echo "Ejemplo de subversion: 15_1."
+			echo "Introduzca un numero de version."
+			echo
+	    ;;
+	    ("minecraft")
+	    	if [ -d "$directorioPrincipal" ];then
+	    			cd "$directorioPrincipal"> /dev/null 2>&1
+			else
+				echo
+				echo "No existe el directorio."
+				echo
+			fi
+	    ;; 
+		(*)
+			echo
+			echo "No ha introducido un numero de version, introduzca un numero de version."
+			echo
+		;;
+	esac
+}
+function ayuda(){
+	echo""
+			echo "						Ayuda para usar los comandos"
+			echo ""
+			echo "           * version"
+			echo "           Comando que inicializa la version de minecraft que quieres"
+			echo "           Ejemplo: minecraft 14"
+			echo ""
+			echo "           * salvar version"
+			echo "           Comando que salvar la partida actual"
+			echo "           Ejemplo: minecraft salvar 14"
+			echo ""
+			echo "           * restaurar version"
+			echo "           Comando que restaura la partida guardada por la actual"
+			echo "           Ejemplo: minecraft restaurar 14"
+			echo ""
+			echo "           * log version "
+			echo "           Comando para ver el log que muestra la consola del juego actual"
+			echo "           Ejemplo: minecraft log 14"
+			echo ""
+			echo "           * logSave last/all version "
+			echo "           Comando para ver el log de las partidas guardadas, usando last solo te enseña la ultima vez que se guardo y usando all te lo enseña entero"
+			echo "           Ejemplo: minecraft logSave last 14"
+			echo ""
+			echo "           * vaciarLog last/all version "
+			echo "           Comando para eliminar todo el log de partidas guardadas usando la opcion all o solo eliminar todo pero dejando la ultima linea del log usando last"
+			echo "           Ejemplo: minecraft vaciarLog last 14"
+			echo ""
+}
