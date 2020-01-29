@@ -1,5 +1,4 @@
 #!/bin/bash
-prueba
 
 #wget -O index https://www.minecraft.net/es-es/download/server/
 #cat index | grep launcher >link.txt
