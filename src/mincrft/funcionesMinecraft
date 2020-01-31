@@ -26,7 +26,6 @@ function downloadServer(){
     fi
 }
 function salvar(){
-
 	valido="0-9_"
 	novalido="a-zA-Z"
 	if [[ $1 =~ ^[$valido] ]] && [ $1 != '_' ] && [ $1 != " " ];then

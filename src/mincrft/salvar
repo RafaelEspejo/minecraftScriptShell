@@ -1,0 +1,57 @@
+##############################################################################
+#																			 #
+#  Script para salvar partidas minecraft   									 #
+#  																			 #
+#  Creado ReaDeveloper  													 #
+#																			 #
+##############################################################################
+
+#!/bin/bash
+
+if [ $1 = "minecraft" ];then
+	valido="0-9_"
+	novalido="a-zA-Z"
+	if [[ $2 =~ ^[$valido] ]] && [ $2 != '_' ] && [ $2 != " " ];then
+		echo
+		echo "Verificando si existe el directorio de juego."
+		if [ -d "$directorioPrincipal$2" ];then	
+			echo
+			echo "Empezando a hacer copia de seguridad del juego $2"
+			echo
+			error=$(rm -R $directorioPrincipal$2/backup/* 2>&1)
+			salida=$(echo $?)
+			fecha=$(date +'%d/%m/%Y %H:%M:%S')
+			if [ $salida = 0 ]; then
+				error=$(cp -R $directorioPrincipal$2/world/ $directorioPrincipal$2/backup/ 2>&1)
+				salida=$(echo $?)
+				if [ $salida = 0 ]; then
+					echo "$fecha - Partida salvada correctamente">>"$directorioPrincipal$2$logSave"
+					echo "Hecha la copia perfectamente. Puedes ejecutar minecraft otra vez"
+					echo
+				elif [ $salida = 1 ]; then
+					echo "$fecha - Se produjo un error al guardar la partida. Error:' $error '">>"$directorioPrincipal$2$logSave"
+					echo "Se produjo un error al guardar la partida, revise el log o pongase en contacto con el administrador."
+					echo
+				fi
+			elif [ $salida = 1 ]; then
+				echo "$fecha - Se produjo un error al guardar la partida. Error:' $error '">>"$directorioPrincipal$2$logSave"
+				echo "Se produjo un error al guardar la partida, revise el log o pongase en contacto con el administrador."
+				echo
+			fi
+		else
+			echo
+			echo "El directorio de juego $directorioPrincipal$2 corresponde a una subversion, no existen los directorios para las subverisones de juego."
+			echo "Copia no realizada, introduzca una version de juego."
+			echo
+		fi
+	elif [ $2 = '_' ];then
+	echo
+	echo "No se puede introducir un $2 como nombre de version."
+	echo
+	else
+		echo
+		echo "La version $2 puede ser una version especial, intente usar la opcion e para hacer la copia de seguridad."
+		echo "Ejemplo: minecraft e salvar 8."
+		echo
+	fi
+fi

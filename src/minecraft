@@ -2,6 +2,7 @@
 directorioPrincipal=/home/minecraft/Minecraft/
 latestLog=/logs/latest.log
 logSave=/logSave.txt
+funciones=/usr/mincrft
 
 #funcion para eliminar las funciones exportadas a la shell en la ejecucion del script
 function eliminar(){
@@ -28,9 +29,8 @@ if [ $1 ];then
 
 		;;
 		("salvar")
-			. funcionesMinecraft
 			if [ $2 ];then
-				salvar $2
+				. "$funciones/salvar" "minecraft" $2
 			else
 				echo 
 				echo "No ha especificado una version de juego."
@@ -74,16 +74,14 @@ if [ $1 ];then
 			fi
 		;;
 		("log")
-			. funcionesMinecraft
-			log $2	
+			. "$funciones/log" "minecraft" $2
 		;;
 		("logSave")
 			. funcionesMinecraft 
 			logSave $2 $3
 		;;
 		("directorio")
-			. funcionesMinecraft
-			directorio $2
+			. "$funciones/directorio" "minecraft" $2
 		;;
 		("versiones")
 
