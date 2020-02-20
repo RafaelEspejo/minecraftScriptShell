@@ -11,7 +11,6 @@
 if [ $1 = "minecraft" ];then
 	if [ $2 ];then 
 		result=$(python3 /usr/mincrft/funciones.py log $2)
-		
 		if [ $result = "Error" ];then
 			echo "Juego no existe"
 		else 
