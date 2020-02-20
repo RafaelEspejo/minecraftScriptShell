@@ -9,36 +9,19 @@
 ##############################################################################
 
 if [ $1 = "minecraft" ];then
-	case $2 in
-		([0-9][0-9] | [0-9])
-			if [ -d "$directorioPrincipal$2" ];then
-				if [ -f $directorioPrincipal$2$latestLog ];then
-					echo
-					cat "$directorioPrincipal$2$latestLog"
-					echo
-				else
-					echo 
-					echo "No existe el log para esta version $2."
-					echo
-				fi
-			else
-				echo
-				echo "No existe el directorio del juego."
-				echo
+	if [ $2 ];then 
+		result=$(python3 /usr/mincrft/funciones.py log $2)
+		
+		if [ $result = "Error" ];then
+			echo "Juego no existe"
+		else 
+			if [ $result != "" ];then 
+				cat $result
+			else 
+				echo "Se ha producido un error"
 			fi
-		;;
-		([0-9]"_"[0-9] | [0-9][0-9]"_"[0-9])
-			echo
-			echo "Recuerde que los directorios de subversion no existen sino los de version."
-			echo "Ejemplo de version: 15."
-			echo "Ejemplo de subversion: 15_1."
-			echo "Introduzca un numero de version."
-			echo
-	    ;; 
-		(*)
-			echo
-			echo "No ha introducido un numero de version, introduzca un numero de version."
-			echo
-		;;
-	esac
+		fi
+	else 
+		echo "Falta saber cual juego quiere ver el log. Introduzca el juego"
+	fi
 fi

@@ -13,9 +13,13 @@ if [ $1 = "minecraft" ];then
 		result=$(python3 /usr/mincrft/funciones.py directorio $2)
 		
 		if [ $result = "Error" ];then
-			echo "Directorio no existe"
+			echo "Juego no existe"
 		else 
-			cd $result
+			if [ $result != "" ];then 
+				cd $result
+			else 
+				echo "Se ha producido un error"
+			fi
 		fi
 	else 
 		python3 /usr/mincrft/funciones.py todosDirectorio
