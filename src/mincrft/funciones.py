@@ -25,8 +25,8 @@ class Minecraft(object):
 
     def todosDirectorio(self):
         juegos=""
-        for juego in archivo['juegos']:
-            juegos=juegos+juego['id']+ "/  "
+        for juego in archivo.get('juegos'):
+            juegos=juegos+juego.get('id')+ "/  "
         if juegos != "":
             print (juegos)
         else:
@@ -34,9 +34,9 @@ class Minecraft(object):
     
     def directorio(self,juego):
         directorio=""
-        for juegos in archivo['juegos']:
-            if juegos['id'] == juego[2] : 
-                directorio=archivo['directorio_principal'] +juegos['directorio']
+        for juegos in archivo.get('juegos'):
+            if juegos.get('id') == juego[2] : 
+                directorio=archivo.get('directorio_principal') +juegos.get('directorio')
                 break
 
         if directorio != "" :
@@ -46,13 +46,15 @@ class Minecraft(object):
     
     def log(self,juego):
         log=""
-        for juegos in archivo['juegos']:
-            if juegos['id'] == juego[2] : 
-                log=archivo['directorio_principal'] +juegos['directorio']+juegos['log']
+        for juegos in archivo.get('juegos'):
+            if juegos.get('id') == juego[2] : 
+                log=archivo.get('directorio_principal') +juegos.get('directorio')+juegos.get('log')
                 break
         if log != "" :
             print (log)
         elif log == "":
             print (self.mensajes.get('log'))
 
+    def salvar(self,juego):
+        pass
 Minecraft(sys.argv)
